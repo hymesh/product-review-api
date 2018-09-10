@@ -7,7 +7,7 @@ namespace App\Services;
 use App\Dtos\ListProductDto;
 use Illuminate\Support\Facades\DB;
 
-class ListProductService
+class ProductRetriever
 {
     private $dto;
 
@@ -16,7 +16,7 @@ class ListProductService
         $this->dto = $dto;
     }
 
-    public function getProducts() {
+    public function retrieveProduct() {
         $products = DB::table('products');
 
         if ($this->dto->getName() !== null) {
