@@ -46,7 +46,12 @@ class ProductController extends Controller
         return new JsonResponse($product, Response::HTTP_CREATED);
     }
 
-    public function updateProduct(UpdateProductRequest $request, ProductRetriever $retriever, ProductModifier $modifier, int $productId) {
+    public function updateProduct(
+        UpdateProductRequest $request,
+        ProductRetriever $retriever,
+        ProductModifier $modifier,
+        int $productId
+    ) {
         $dto = $request->getProductUpdateParamDto();
         $product = $retriever->retrieveById($productId);
 
@@ -68,8 +73,12 @@ class ProductController extends Controller
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 
-    public function listReview(ListReviewRequest $request, ProductRetriever $productRetriever, ReviewRetriever $reviewRetriever, int $productId)
-    {
+    public function listReview(
+        ListReviewRequest $request,
+        ProductRetriever $productRetriever,
+        ReviewRetriever $reviewRetriever,
+        int $productId
+    ) {
         $dto = $request->getReviewListDto();
         $product = $productRetriever->retrieveById($productId);
         $reviews = $reviewRetriever->retrieveReviews($product, $dto);
@@ -77,14 +86,23 @@ class ProductController extends Controller
         return new JsonResponse($reviews);
     }
 
-    public function createReview(CreateReviewRequest $request, ProductRetriever $retriever, ReviewCreator $creator, $productId)
-    {
+    public function createReview(
+        CreateReviewRequest $request,
+        ProductRetriever $retriever,
+        ReviewCreator $creator,
+        int $productId
+    ) {
         $user = $request->user();
         $content = $request->input('content');
 
-        \DB::transaction(function () use ($retriever, $creator, $user, $productId, $content) {
+        DB::transaction(function () use (
+            $retriever,
+            $creator,
+            $user,
+            $productId,
+            $content
+        ) {
             $product = $retriever->retrieveById($productId);
-
             $review = $creator->createReview($content);
 
             $review->user()->associate($user);

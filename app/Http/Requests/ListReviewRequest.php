@@ -9,21 +9,21 @@ class ListReviewRequest extends Request
     public function rules()
     {
         return [
+            'page' => [
+                'integer',
+                'min:1',
+            ],
             'size' => [
                 'integer',
                 'min:1',
             ],
-            'page' => [
-                'integer',
-                'min:1',
-            ]
         ];
     }
 
     public function getReviewListDto() {
         return new ListReviewDto(
-            $this->input('size', null),
-            $this->input('page', null)
+            $this->input('page'),
+            $this->input('size')
         );
     }
 }

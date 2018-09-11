@@ -10,11 +10,10 @@ class UpdateProductDto
     private $price;
 
     public function __construct(
-        $name,
-        $description,
-        $price
-    )
-    {
+        string $name = null,
+        string $description = null,
+        int $price = null
+    ) {
         $this->name = $name;
         $this->description = $description;
         $this->price = $price;

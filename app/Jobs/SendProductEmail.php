@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Jobs\Job;
 use App\Product;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Queue\SerializesModels;
@@ -13,7 +12,7 @@ class SendProductEmail extends Job implements ShouldQueue
 {
     use InteractsWithQueue, SerializesModels;
 
-    public $product;
+    private $product;
 
     public function __construct(Product $product)
     {
@@ -32,8 +31,8 @@ class SendProductEmail extends Job implements ShouldQueue
             $this->product->name
         );
 
-        $mailer->raw($message,function ($m) {
-
+        $mailer->raw($message, function ($m) {
+            // empty
         });
     }
 }

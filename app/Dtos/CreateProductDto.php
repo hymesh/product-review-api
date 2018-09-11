@@ -12,8 +12,7 @@ class CreateProductDto
         string $name,
         string $description,
         int $price
-    )
-    {
+    ) {
         $this->name = $name;
         $this->description = $description;
         $this->price = $price;

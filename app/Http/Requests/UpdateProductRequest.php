@@ -15,9 +15,9 @@ class UpdateProductRequest extends Request
 
     public function getProductUpdateParamDto() {
         return new UpdateProductDto(
-            $this->input('name', null),
-            $this->input('description', null),
-            $this->input('price', null)
+            $this->input('name'),
+            $this->input('description'),
+            $this->input('price')
         );
     }
 }
