@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendProductEmail;
 use App\Http\Requests\CreateProductRequest;
 use App\Http\Requests\CreateReviewRequest;
 use App\Http\Requests\ListProductRequest;
@@ -38,6 +39,9 @@ class ProductController extends Controller
         $dto = $request->getProductCreateParamDto();
         $product = $creator->createProduct($dto);
         $product->save();
+
+        $job = (new sendProductEmail($product))->onQueue('emails');
+        $this->dispatch($job);
 
         return new JsonResponse($product, Response::HTTP_CREATED);
     }
@@ -78,18 +82,16 @@ class ProductController extends Controller
         $user = $request->user();
         $content = $request->input('content');
 
-        DB::beginTransaction();
+        \DB::transaction(function () use ($retriever, $creator, $user, $productId, $content) {
+            $product = $retriever->retrieveById($productId);
 
-        $product = $retriever->retrieveById($productId);
+            $review = $creator->createReview($content);
 
-        $review = $creator->createReview($content);
+            $review->user()->associate($user);
+            $review->product()->associate($product);
 
-        $review->user()->associate($user);
-        $review->product()->associate($product);
-
-        $review->save();
-
-        DB::commit();
+            $review->save();
+        });
 
         return new JsonResponse(null, Response::HTTP_CREATED);
     }
