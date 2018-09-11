@@ -4,6 +4,11 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @parameter $content string
+ * @parameter $user_id int
+ * @parameter $product_id int
+ */
 class Review extends Model
 {
     public $timestamps = false;
@@ -14,7 +19,7 @@ class Review extends Model
      * @var array
      */
     protected $fillable = [
-        'content'
+        'content', 'user_id'
     ];
 
     /**

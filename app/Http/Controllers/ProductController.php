@@ -2,57 +2,122 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
+use App\Dtos\CreateProductDto;
+use App\Dtos\ListProductDto;
+use App\Dtos\UpdateProductDto;
+use App\Http\Requests\CreateProductRequest;
+use App\Http\Requests\CreateReviewRequest;
+use App\Http\Requests\ListProductRequest;
+use App\Http\Requests\UpdateProductRequest;
 use App\Product;
-use App\Review;
+use App\Services\ProductCreator;
+use App\Services\ProductModifier;
+use App\Services\ProductRetriever;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function listProduct(ListProductRequest $request)
     {
-        return Product::all();
+        $dto = new ListProductDto($request);
+        $service = new ProductRetriever($dto);
+
+        $products = $service->retrieveProduct();
+        $products = $products->paginate($request->input('page_size', 15));
+
+        return new JsonResponse($products);
     }
 
-    public function show(Product $product)
+    public function getProduct($productId)
     {
-        return $product;
+        try {
+            $product = Product::findOrFail($productId);
+            return new JsonResponse($product);
+        } catch (ModelNotFoundException $e) {
+            return new JsonResponse(null, Response::HTTP_NOT_FOUND);
+        }
     }
 
-    public function store(Request $request)
+    public function createProduct(CreateProductRequest $request)
     {
-        $product = Product::create($request->all());
+        $dto = new CreateProductDto($request);
+        $service = new ProductCreator($dto);
 
-        return response()->json($product, 201);
+        $product = DB::transaction(function () use ($service) {
+            $product = $service->createProduct();
+            $product->save();
+
+            return $product;
+        });
+
+        return new JsonResponse($product, Response::HTTP_CREATED);
     }
 
-    public function update(Request $request, Product $product) {
-        $product->update($request->all());
+    public function updateProduct(UpdateProductRequest $request, $productId) {
+        $dto = new UpdateProductDto($request, $productId);
+        $service = new ProductModifier($dto);
 
-        return response()->json($product, 200);
+        $product = DB::transaction(function () use ($service) {
+            $product = $service->modifyProduct();
+
+            if ($product !== null) {
+                $product->save();
+            }
+
+            return $product;
+        });
+
+        if ($product === null) {
+            return new JsonResponse(null, Response::HTTP_NOT_FOUND);
+        } else {
+            return new JsonResponse($product);
+        }
     }
 
-    public function destroy(Product $product)
+    public function deleteProduct($productId)
     {
-        $product->delete();
+        try {
+            $product = Product::findOrFail($productId);
+            $product->delete();
 
-        return response()->json(null, 204);
+            return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+        } catch (ModelNotFoundException $e) {
+            return new JsonResponse(null, Response::HTTP_NOT_FOUND);
+        }
     }
 
-    public function showReviews(Product $product)
+    public function listReview(Request $request, $productId)
     {
-        return $product->reviews()->get();
+        try {
+            $product = Product::findOrFail($productId);
+
+            $reviews = $product->reviews()->paginate($request->input('page_size', 15));
+
+            return new JsonResponse($reviews);
+        } catch (ModelNotFoundException $e) {
+            return new JsonResponse(null, Response::HTTP_NOT_FOUND);
+        }
     }
 
-    public function storeReview(Request $request, Product $product)
+    public function createReview(CreateReviewRequest $request, $productId)
     {
         $user = $request->user();
+        try {
+            $product = Product::findOrFail($productId);
 
-        $review = new Review($request->all());
-        $review->user_id = $user->id;
-        $review->product_id = $product->id;
-        $review->save();
+            $content = $request->input('content');
+            $product->reviews()->create([
+                'content' => $content,
+                'user_id' => $user->id
+            ]);
 
-        return response()->json($review, 201);
+            return new JsonResponse(null, Response::HTTP_CREATED);
+        } catch (ModelNotFoundException $e) {
+            return new JsonResponse(null, Response::HTTP_NOT_FOUND);
+        }
     }
 }
