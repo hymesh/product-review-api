@@ -10,9 +10,9 @@ class UpdateProductDto
     private $price;
 
     public function __construct(
-        string $name,
-        string $description,
-        int $price
+        $name,
+        $description,
+        $price
     )
     {
         $this->name = $name;
