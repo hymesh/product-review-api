@@ -3,6 +3,8 @@
 namespace App\Exceptions;
 
 use Exception;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -45,6 +47,11 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $e)
     {
+        if ($request->wantsJson()) {
+            if ($e instanceof ModelNotFoundException) {
+                return new JsonResponse(['error' => '요청을 처리할 수 없습니다.'], Response::HTTP_NOT_FOUND);
+            }
+        }
         return parent::render($request, $e);
     }
 }
