@@ -2,19 +2,21 @@
 
 namespace App\Dtos;
 
-use App\Http\Requests\CreateProductRequest;
-
 class CreateProductDto
 {
     private $name;
     private $description;
     private $price;
 
-    public function __construct(CreateProductRequest $request)
+    public function __construct(
+        string $name,
+        string $description,
+        int $price
+    )
     {
-        $this->name = $request->input('name', null);
-        $this->description = $request->input('description', null);
-        $this->price = $request->input('price', null);
+        $this->name = $name;
+        $this->description = $description;
+        $this->price = $price;
     }
 
     public function getName()

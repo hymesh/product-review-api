@@ -9,7 +9,7 @@ use App\Product;
 
 class ProductRetriever
 {
-    public function retrieveProduct(ListProductDto $dto) {
+    public function retrieveProducts(ListProductDto $dto) {
         $builder = Product::query();
 
         $name = $dto->getName();
@@ -30,5 +30,10 @@ class ProductRetriever
         }
 
         return $builder->paginate($dto->getSize(), ['*'], 'page', $dto->getPage());
+    }
+
+    public function retrieveById(int $productId): Product
+    {
+        return Product::findOrFail($productId);
     }
 }

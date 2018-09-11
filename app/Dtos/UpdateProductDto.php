@@ -3,26 +3,21 @@
 
 namespace App\Dtos;
 
-use App\Http\Requests\UpdateProductRequest;
-
 class UpdateProductDto
 {
-    private $id;
     private $name;
     private $description;
     private $price;
 
-    public function __construct(UpdateProductRequest $request, $productId)
+    public function __construct(
+        string $name,
+        string $description,
+        int $price
+    )
     {
-        $this->id = $productId;
-        $this->name = $request->input('name', null);
-        $this->description = $request->input('description', null);
-        $this->price = $request->input('price', null);
-    }
-
-    public function getId()
-    {
-        return $this->id;
+        $this->name = $name;
+        $this->description = $description;
+        $this->price = $price;
     }
 
     public function getName()
