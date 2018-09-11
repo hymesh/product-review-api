@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Product;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class DoubleProductPrice extends Command
 {
@@ -39,13 +40,21 @@ class DoubleProductPrice extends Command
     public function handle()
     {
         $this->line('모든 제품의 가격을 두 배로 증가시킵니다.');
-        if ($this->confirm('계속 하시겠습니까? [y|N]')) {
+        if ($this->confirm('계속 하시겠습니까?')) {
             DB::transaction(function () {
-                DB::table('products')->chunk(100, function ($products) {
+                Product::chunk(100, function ($products) {
                     foreach ($products as $product) {
-
                         $product->price = $product-> price * 2;
                         $product->save();
+
+                        $format = '%s (id: %d) 가격 변경 (%d  ->  %d)';
+                        $this->line(sprintf(
+                            $format,
+                            $product->name,
+                            $product->id,
+                            $product->price,
+                            $product->price * 2
+                        ));
                     }
                 });
             });
