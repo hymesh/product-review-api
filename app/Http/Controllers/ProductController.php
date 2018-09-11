@@ -21,13 +21,10 @@ use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
-    public function listProduct(ListProductRequest $request)
+    public function listProduct(ListProductRequest $request, ProductRetriever $retriever)
     {
-        $dto = new ListProductDto($request);
-        $service = new ProductRetriever($dto);
-
-        $products = $service->retrieveProduct();
-        $products = $products->paginate($request->input('page_size', 15));
+        $dto = $request->getProductSearchParamDto();
+        $products = $retriever->retrieveProduct($dto);
 
         return new JsonResponse($products);
     }

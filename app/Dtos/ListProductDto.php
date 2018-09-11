@@ -2,21 +2,29 @@
 
 namespace App\Dtos;
 
-use App\Http\Requests\ListProductRequest;
-
 class ListProductDto
 {
     private $name;
     private $description;
     private $priceFrom;
     private $priceTo;
+    private $page;
+    private $size;
 
-    public function __construct(ListProductRequest $request)
-    {
-        $this->name = $request->input('name', null);
-        $this->description = $request->input('description', null);
-        $this->priceFrom = $request->input('price_from', null);
-        $this->priceTo = $request->input('price_to', null);
+    public function __construct(
+        string $name = null,
+        string $description = null,
+        int $priceFrom = null,
+        int $priceTo = null,
+        int $page = null,
+        int $size = null
+    ) {
+        $this->name = $name;
+        $this->description = $description;
+        $this->priceFrom = $priceFrom;
+        $this->priceTo = $priceTo;
+        $this->page = $page;
+        $this->size = $size;
     }
 
     public function getName()
@@ -37,5 +45,15 @@ class ListProductDto
     public function getPriceTo()
     {
         return $this->priceTo;
+    }
+
+    public function getPage()
+    {
+        return $this->page;
+    }
+
+    public function getSize()
+    {
+        return $this->size;
     }
 }

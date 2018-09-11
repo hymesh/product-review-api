@@ -5,36 +5,30 @@ namespace App\Services;
 
 
 use App\Dtos\ListProductDto;
-use Illuminate\Support\Facades\DB;
+use App\Product;
 
 class ProductRetriever
 {
-    private $dto;
+    public function retrieveProduct(ListProductDto $dto) {
+        $builder = Product::query();
 
-    public function __construct(ListProductDto $dto)
-    {
-        $this->dto = $dto;
-    }
-
-    public function retrieveProduct() {
-        $products = DB::table('products');
-
-        if ($this->dto->getName() !== null) {
-            $products = $products->where('name', $this->dto->getName());
+        $name = $dto->getName();
+        if ($name !== null) {
+            $builder->where('name', $name);
         }
 
-        if ($this->dto->getDescription() !== null) {
-            $products = $products->where('description', $this->dto->getDescription());
+        if ($dto->getDescription() !== null) {
+            $builder->where('description', $dto->getDescription());
         }
 
-        if ($this->dto->getPriceFrom() !== null) {
-            $products = $products->where('price', '>=', $this->dto->getPriceFrom());
+        if ($dto->getPriceFrom() !== null) {
+            $builder->where('price', '>=', $dto->getPriceFrom());
         }
 
-        if ($this->dto->getPriceTo() !== null) {
-            $products = $products->where('price', '<=', $this->dto->getPriceTo());
+        if ($dto->getPriceTo() !== null) {
+            $builder->where('price', '<=', $dto->getPriceTo());
         }
 
-        return $products;
+        return $builder->paginate($dto->getSize(), ['*'], 'page', $dto->getPage());
     }
 }
