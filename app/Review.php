@@ -5,9 +5,9 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * @parameter $content string
- * @parameter $user_id int
- * @parameter $product_id int
+ * @property string $content
+ * @property int $user_id
+ * @property int $product_id
  */
 class Review extends Model
 {
@@ -19,7 +19,7 @@ class Review extends Model
      * @var array
      */
     protected $fillable = [
-        'content', 'user_id'
+        'content', 'user_id', 'product_id',
     ];
 
     /**
